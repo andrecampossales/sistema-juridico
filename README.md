@@ -1,0 +1,1 @@
+O presente projeto tem como objeto criar um sistema jurídico capaz de realizar cadastro, consulta, deleção e alteração de processos. Também poderá receber arquivos para vincular aos processos e facilitar a consulta.
