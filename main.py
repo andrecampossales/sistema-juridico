@@ -1,14 +1,29 @@
+from enum import StrEnum
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
 app = FastAPI()
 
 
+class StatusProcesso(StrEnum):
+    ATIVO = 'ATIVO'
+    ARQUIVADO = 'ARQUIVADO'
+    EXTINTO = 'EXTINTO'
+    SUSPENSO = 'SUSPENSO'
+
+
+class EscritorioRepresenta(StrEnum):
+    REQUERENTE = 'REQUERENTE'
+    REQUERIDO = 'REQUERIDO'
+
+
 class Processo(BaseModel):
     numero_cnj: str
     vara: str
-    status: str
+    status: StatusProcesso
     valor_causa: str
+    escritorio_representa: EscritorioRepresenta
 
 
 lista_processos = []
