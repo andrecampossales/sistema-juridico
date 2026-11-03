@@ -1,7 +1,8 @@
+from decimal import Decimal
 from enum import StrEnum
 
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 app = FastAPI()
 
@@ -22,7 +23,7 @@ class Processo(BaseModel):
     numero_cnj: str
     vara: str
     status: StatusProcesso
-    valor_causa: str
+    valor_causa: Decimal = Field(ge=0, decimal_places=2)
     escritorio_representa: EscritorioRepresenta
 
 
@@ -41,12 +42,12 @@ def boas_vindas():
     return {'mensagem': 'API do Sistema Jurídico no ar.'}
 
 
-@app.get('/processos')
+@app.get('/processos', response_model=list[Processo])
 def exibir_processos():
     return lista_processos
 
 
-@app.get('/processos/{numero_cnj}')
+@app.get('/processos/{numero_cnj}', response_model=Processo)
 def consultar_processo(numero_cnj: str):
     indice = buscar_indice(numero_cnj)
     if indice is None:
@@ -54,7 +55,7 @@ def consultar_processo(numero_cnj: str):
     return lista_processos[indice]
 
 
-@app.post('/processos', status_code=201)
+@app.post('/processos', status_code=201, response_model=Processo)
 def cadastrar_processo(processo: Processo):
     indice = buscar_indice(processo.numero_cnj)
     if indice is not None:
@@ -63,7 +64,7 @@ def cadastrar_processo(processo: Processo):
     return processo
 
 
-@app.put('/processos/{numero_cnj}')
+@app.put('/processos/{numero_cnj}', response_model=Processo)
 def atualizar_processo(numero_cnj: str, processo: Processo):
     if processo.numero_cnj != numero_cnj:
         raise HTTPException(status_code=400, detail='Não é permitido alterar o número CNJ do processo.')
