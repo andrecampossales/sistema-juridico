@@ -39,9 +39,13 @@ lista_processos = []
 
 def buscar_indice(numero_cnj: str):
     for indice, processo in enumerate(lista_processos):
-        if numero_cnj == processo['numero_cnj']:
-            return indice
-    return None
+        try:
+            numero_cnj = normalizar_cnj(numero_cnj)
+            if numero_cnj == processo['numero_cnj']:
+                return indice
+        except ValueError:
+            return None
+    
 
 
 @app.get('/')
@@ -73,11 +77,11 @@ def cadastrar_processo(processo: Processo):
 
 @app.put('/processos/{numero_cnj}', response_model=Processo)
 def atualizar_processo(numero_cnj: str, processo: Processo):
-    if processo.numero_cnj != numero_cnj:
-        raise HTTPException(status_code=400, detail='Não é permitido alterar o número CNJ do processo.')
     indice = buscar_indice(numero_cnj)
-    if indice is None:
+    if indice == None:
         raise HTTPException(status_code=404, detail='Processo não encontrado.')
+    if processo.numero_cnj != lista_processos[indice]['numero_cnj']:
+        raise HTTPException(status_code=400, detail='Não é permitido alterar o número CNJ do processo.')
     lista_processos[indice] = processo.model_dump()
     return processo
 
