@@ -2,7 +2,9 @@ from decimal import Decimal
 from enum import StrEnum
 
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
+
+from cnj import normalizar_cnj
 
 app = FastAPI()
 
@@ -25,6 +27,11 @@ class Processo(BaseModel):
     status: StatusProcesso
     valor_causa: Decimal = Field(ge=0, decimal_places=2)
     escritorio_representa: EscritorioRepresenta
+
+    @field_validator('numero_cnj')
+    @classmethod
+    def validar_numero_cnj(cls, valor: str) -> str:
+        return normalizar_cnj(valor)
 
 
 lista_processos = []
